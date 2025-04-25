@@ -1,34 +1,30 @@
 package com.example.class22.Carnet
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.*
-class Navegacion {
-    @Composable
-    fun MostrarNavegacion() {
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+
+@Composable
+fun MostrarNavegacion() {
         val navController = rememberNavController()
+        val mascotaViewModel = remember { MascotaViewModel() }
         NavHost(navController, startDestination = "screenA") {
-            composable("screenA") { PantallaRegistro(navController) }
             composable(
-                "screenB/{nombre}/{raza}/{tamano}/{edad}/{fotoUrl}"
+                route = "screenA?editIndex={editIndex}",
+                arguments = listOf(navArgument("editIndex") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                })
             ) { backStackEntry ->
-                val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
-                val raza = backStackEntry.arguments?.getString("raza") ?: ""
-                val tamano = backStackEntry.arguments?.getString("tamano") ?: ""
-                val edad = backStackEntry.arguments?.getString("edad") ?: ""
-                val fotoUrl = backStackEntry.arguments?.getString("fotoUrl") ?: ""
-                PantallaCarnet(nombre, raza, tamano, edad, fotoUrl)
+                val index = backStackEntry.arguments?.getInt("editIndex")?.takeIf { it >= 0 }
+                PantallaRegistro(navController, mascotaViewModel, indexEditar = index)
+            }
+            composable("screenB") {
+                PantallaCarnet(navController, mascotaViewModel)
             }
         }
     }
-}
